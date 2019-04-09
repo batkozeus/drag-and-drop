@@ -20,7 +20,7 @@ export default class Column extends React.Component {
         return (
             <Container>
                 <Title>{this.props.column.title}</Title>
-                <Droppable droppableId={this.props.column.title}>
+                <Droppable droppableId={this.props.column.id}>
                     {provided => (
                         <TaskList
                             ref={provided.innerRef}
