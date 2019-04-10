@@ -13,12 +13,12 @@ const initiakData = {
         },
         'column-2': {
             id: 'column-2',
-            title: 'To do',
+            title: 'In progress',
             taskIds: [],
         },
         'column-3': {
             id: 'column-3',
-            title: 'To do',
+            title: 'Done',
             taskIds: [],
         }
     },
