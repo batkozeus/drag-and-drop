@@ -11,10 +11,27 @@ const Container = styled.div`
     display: flex;
 `;
 
+class InnerList extends React.PureComponent {
+    render() {
+        const { column, taskMap, index, isDropDisabled } = this.props;
+        const tasks = column.taskIds.map(taskId => taskMap[taskId]);
+        return (<Column
+            key={column.id}
+            column={column}
+            tasks={tasks}
+            index={index}
+            isDropDisabled={isDropDisabled}
+        />)
+    }
+}
 class App extends React.Component {
     state = initialData;
 
-    onDragStart = start => {
+    onDragStart = (start, provided) => {
+        provided.announce(
+            `You have lifted the task in position ${start.source.index + 1}`
+        )
+
         const homeIndex = this.state.columnOrder.indexOf(start.source.droppableId);
 
         this.setState({
@@ -24,7 +41,13 @@ class App extends React.Component {
         document.body.style.color = 'orange';
         document.body.style.transition = 'background-color 0.2s ease';
     }
-    onDragUpdate = update => {
+
+    onDragUpdate = (update, provided) => {
+        const message = update.destination
+            ? `You have moved the task to position ${update.destination.index + 1}`
+            : `You are currently not over a droppable area`;
+        provided.announce(message);
+
         const { destination } = update;
         const opacity = destination
             ? destination.index / Object.keys(this.state.tasks).length
@@ -32,7 +55,14 @@ class App extends React.Component {
         document.body.style.backgroundColor = `rgba(153, 141, 217, ${opacity})`;
     };
 
-    onDragEnd = result => {
+    onDragEnd = (result, provided) => {
+        const message = result.destination
+        ? `You have moved the task from position 
+            ${result.source.index + 1} to position ${result.destination.index + 1}`
+        : `The task has been returned to its starting position of
+            ${result.source.index + 1}`;
+        provided.announce(message);
+
         this.setState({
             homeIndex: null,
         });
@@ -141,13 +171,12 @@ class App extends React.Component {
                         >
                             {this.state.columnOrder.map((columnId, index) => {
                                 const column = this.state.columns[columnId];
-                                const tasks = column.taskIds.map(taskId => this.state.tasks[taskId]);
                                 const isDropDisabled = index < this.state.homeIndex;
 
-                                return <Column
+                                return <InnerList
                                     key={column.id}
                                     column={column}
-                                    tasks={tasks}
+                                    taskMap={this.state.tasks}
                                     index={index}
                                     isDropDisabled={isDropDisabled}
                                 />
